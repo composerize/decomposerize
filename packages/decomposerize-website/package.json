@@ -1,0 +1,43 @@
+{
+  "version": "0.0.0-not-distributed",
+  "private": true,
+  "name": "decomposerize-website",
+  "homepage": "https://www.decomposerize.com",
+  "dependencies": {
+    "babel-plugin-styled-components": "^1.10.7",
+    "decomposerize": "1.0.0",
+    "html5-boilerplate": "^7.2.0",
+    "normalize.css": "^8.0.1",
+    "react": "16.x",
+    "react-copy-to-clipboard": "^5.0.1",
+    "react-dom": "16.x",
+    "react-is": "16.x",
+    "react-portal-tooltip": "^2.4.7",
+    "styled-components": "5.x"
+  },
+  "devDependencies": {
+    "react-scripts": "3.4.1"
+  },
+  "scripts": {
+    "start": "make .env && react-scripts start",
+    "build": "make .env && react-scripts build",
+    "test": "make .env && react-scripts test --env=jsdom"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true
+    }
+  }
+}

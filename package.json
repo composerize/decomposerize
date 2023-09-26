@@ -1,0 +1,41 @@
+{
+  "name": "decomposerize",
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "packages/**"
+  ],
+  "nohoist": [
+    "**/react-scripts",
+    "**/react-scripts/**"
+  ],
+  "scripts": {
+    "eslint": "eslint packages/**/*/{src,__tests__}/**/*.js --format codeframe"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-flow": "^7.0.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^9.0.0",
+    "babel-jest": "^24.9.0",
+    "eslint": "^6.8.0",
+    "flow-bin": "^0.129.0",
+    "husky": "^4.2.5",
+    "jest": "^25.5.4"
+  },
+  "dependencies": {
+    "@sharkcore/eslint-config": "^1.1.0-alpha.3",
+    "lerna": "^3.20.2"
+  },
+  "engines": {
+    "node": ">=8",
+    "yarn": "<= 1.19.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "./tools/eslint"
+    }
+  }
+}
