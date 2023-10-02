@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+//import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
-const ADS_URL = '//cdn.carbonads.com/carbon.js?serve=CE7IK5QU&placement=wwwdecomposerizecom'; //TODO: reconfigure
-const CARBON_SCRIPT_ID = '_carbonads_js';
+//const ADS_URL = '//cdn.carbonads.com/carbon.js?serve=CE7IK5QU&placement=wwwdecomposerizecom'; //TODO: reconfigure
+//const CARBON_SCRIPT_ID = '_carbonads_js';
 
 const CarbonAds = React.memo(() => {
     // Where we'll render the ad into
