@@ -33,6 +33,13 @@ export default () => (
             <Link href="https://github.com/outilslibre/decomposerize">
                 <img alt="npm" src="https://img.shields.io/npm/v/decomposerize" />
             </Link>
+            <Link href="https://github.com/sharevb">
+                <img
+                    src="https://img.shields.io/badge/ShareVB-100000?logo=github&logoColor=white"
+                    alt="ShareVB on GitHub"
+                    style={{ height: '20px' }}
+                />
+            </Link>
             <Link href="https://github.com/outilslibre/decomposerize">
                 <img
                     src="https://img.shields.io/github/stars/outilslibre/decomposerize.svg?style=social&label=Star"
