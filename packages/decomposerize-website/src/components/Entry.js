@@ -41,6 +41,11 @@ export default function Entry(props) {
                             </a>{' '}
                             content into the box below!
                         </p>
+						<p>Looking for the reverse (<Code>docker run</Code> command(s) to Docker compose) ? Try <a
+                                href="https://composerize.com"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >Composerize</a></p>						
                     </Blurb>
                     <TextInput command={props.command} onInputChange={props.onInputChange} />
                 </div>
