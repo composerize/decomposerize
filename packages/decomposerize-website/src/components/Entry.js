@@ -46,6 +46,12 @@ export default function Entry(props) {
                                 rel="noopener noreferrer"
                                 target="_blank"
                             >Composerize</a></p>						
+                        <p>
+                            Want to convert from Docker compose file formats ? Try{' '}
+                            <a href="http://composeverter.com" rel="noopener noreferrer" target="_blank">
+                                Composeverter
+                            </a>
+                        </p>
                     </Blurb>
                     <TextInput command={props.command} onInputChange={props.onInputChange} />
                 </div>
