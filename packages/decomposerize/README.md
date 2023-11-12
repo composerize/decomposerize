@@ -1,12 +1,13 @@
 # decomposerize
 
-[![Build Status](https://travis-ci.org/outilslibre/decomposerize.svg?branch=master)](https://travis-ci.com/github/outilslibre/decomposerize)
 [![npm](https://img.shields.io/npm/v/decomposerize.svg)](https://www.npmjs.com/package/decomposerize)
-[ShareVB on GitHub](https://github.com/sharevb)
+[![ShareVB on GitHub](https://img.shields.io/badge/ShareVB-100000?logo=github&logoColor=white)](https://github.com/sharevb)
             
 http://decomposerize.com - Turns docker-compose file into `docker run` commands!
 
 Looking for the reverse : http://composerize.com / [Composerize](https://github.com/magicmark/composerize)
+
+Want to convert from Docker compose file formats : http://composeverter.com / [Composeverter](https://github.com/outilslibre/composeverter)
 
 ## CLI
 
