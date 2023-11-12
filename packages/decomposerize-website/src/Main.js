@@ -28,6 +28,7 @@ export default class Main extends Component {
         this.state = {
             input: defaultCommand,
             output: Decomposerize(defaultCommand),
+            error: '',
         };
         this.onInputChange = this.onInputChange.bind(this);
     }
@@ -35,7 +36,22 @@ export default class Main extends Component {
     onInputChange(value) {
         this.setState({
             input: value,
-            output: Decomposerize(value),
+        });
+        this.updateConversion();
+    }
+
+    updateConversion() {
+        this.setState(state => {
+            try {
+                return {
+                    output: Decomposerize(state.input),
+                    error: '',
+                };
+            } catch (e) {
+                return {
+                    error: e.toString(),
+                };
+            }
         });
     }
 
@@ -44,7 +60,7 @@ export default class Main extends Component {
             <div>
                 <Header />
                 <Entry command={this.state.input} onInputChange={this.onInputChange} />
-                <Output output={this.state.output} />
+                <Output output={this.state.output} error={this.state.error} />
                 <Footer />
             </div>
         );
