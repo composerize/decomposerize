@@ -27,8 +27,7 @@ export default function Entry(props) {
                 >
                     <Blurb>
                         <p>
-                            Convert your docker compose file to <Code>$ docker run</Code> command(s){' '}
-                            :)
+                            Convert your docker compose file to <Code>$ docker run</Code> command(s) :)
                         </p>
                         <p>
                             Paste your{' '}
@@ -41,11 +40,12 @@ export default function Entry(props) {
                             </a>{' '}
                             content into the box below!
                         </p>
-						<p>Looking for the reverse (<Code>docker run</Code> command(s) to Docker compose) ? Try <a
-                                href="https://composerize.com"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                            >Composerize</a></p>						
+                        <p>
+                            Looking for the reverse (<Code>docker run</Code> command(s) to Docker compose) ? Try{' '}
+                            <a href="https://composerize.com" rel="noopener noreferrer" target="_blank">
+                                Composerize
+                            </a>
+                        </p>
                         <p>
                             Want to convert from Docker compose file formats ? Try{' '}
                             <a href="http://composeverter.com" rel="noopener noreferrer" target="_blank">

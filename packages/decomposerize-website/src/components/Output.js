@@ -31,7 +31,11 @@ export default props => (
             </p>
             <p>
                 For more help, please consult the{' '}
-                <a href="https://docs.docker.com/engine/reference/commandline/run/" rel="noopener noreferrer" target="_blank">
+                <a
+                    href="https://docs.docker.com/engine/reference/commandline/run/"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                >
                     docker run
                 </a>{' '}
                 documentation.

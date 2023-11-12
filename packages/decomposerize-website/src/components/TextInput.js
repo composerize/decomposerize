@@ -5,7 +5,7 @@ import CBox from './CBox';
 
 const StyledInput = styled.textarea`
     ${CBox}
-	height:15em;
+    height:15em;
 `;
 
 export default class TextInput extends Component {
