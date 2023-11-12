@@ -2,7 +2,8 @@
 
 import 'core-js/fn/object/entries';
 
-import yamljs from 'yamljs';
+import YAML from 'yaml';
+import Composeverter from 'composeverter';
 
 import { MAPPINGS } from './mappings';
 
@@ -27,7 +28,7 @@ export type Configuration = {
 };
 
 export default (input: string, configuration: Configuration = {}): ?string => {
-    const composeJson = yamljs.parse(input.replace(/#.*/gm, ''));
+    const composeJson = YAML.parse(Composeverter.migrateToCommonSpec(input));
     const defaultConfiguration = {
         command: 'docker run',
         rm: false,
@@ -37,9 +38,6 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         'arg-value-separator': ' ',
     };
     const config = Object.assign(defaultConfiguration, configuration);
-
-    if (!composeJson.services || composeJson.services.length === 0)
-        throw new Error('Docker Compose has no services: entry');
 
     const stringify = (value: any): string => {
         const stringValue = String(value);
@@ -113,7 +111,7 @@ export default (input: string, configuration: Configuration = {}): ?string => {
                 if (type === 'Switch') {
                     // $FlowFixMe
                     if (targetValue.toString() === 'true') pushOption('');
-					return;
+                    return;
                 }
                 if (type === 'Value') {
                     pushOption(stringify(targetValue));

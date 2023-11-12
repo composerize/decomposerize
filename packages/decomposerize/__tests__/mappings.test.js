@@ -69,7 +69,9 @@ test('--user', () => {
                     image: 'foobar/baz:latest'
       `;
 
-    expect(Decomposerize(compose,{'long-args':true})).toMatchInlineSnapshot('"docker run --user 99:100 --publish 80:80 foobar/baz:latest"');
+    expect(Decomposerize(compose, { 'long-args': true })).toMatchInlineSnapshot(
+        '"docker run --user 99:100 --publish 80:80 foobar/baz:latest"',
+    );
 });
 
 test('--label', () => {
@@ -85,7 +87,9 @@ test('--label', () => {
                     image: 'foobar/baz:latest'
       `;
 
-    expect(Decomposerize(compose)).toMatchInlineSnapshot('"docker run -l test1=value -l test2=value -p 80:80 foobar/baz:latest"');
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(
+        '"docker run -l test1=value -l test2=value -p 80:80 foobar/baz:latest"',
+    );
 });
 
 test('--hostname --domainname', () => {
@@ -100,7 +104,9 @@ test('--hostname --domainname', () => {
                     image: 'foobar/baz:latest'
       `;
 
-    expect(Decomposerize(compose,{'long-args':true})).toMatchInlineSnapshot('"docker run --hostname myHostName --domainname example.org --publish 80:80 foobar/baz:latest"');
+    expect(Decomposerize(compose, { 'long-args': true })).toMatchInlineSnapshot(
+        '"docker run --hostname myHostName --domainname example.org --publish 80:80 foobar/baz:latest"',
+    );
 });
 
 test('-h', () => {
@@ -132,10 +138,10 @@ test('--network (https://github.com/magicmark/composerize/issues/25)', () => {
                         - '<path/to/transcode/temp>:/transcode'
                         - '<path/to/media>:/data'
                     image: plexinc/pms-docker
-      `
-        ;
-
-    expect(Decomposerize(compose)).toMatchInlineSnapshot('"docker run --net host --name plex -e TZ=<timezone> -e PLEX_CLAIM=<claimToken> -v <path/to/plex/database>:/config -v <path/to/transcode/temp>:/transcode -v <path/to/media>:/data plexinc/pms-docker"');
+      `;
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(
+        '"docker run --net host --name plex -e TZ=<timezone> -e PLEX_CLAIM=<claimToken> -v <path/to/plex/database>:/config -v <path/to/transcode/temp>:/transcode -v <path/to/media>:/data plexinc/pms-docker"',
+    );
 });
 
 test('--pid ', () => {
@@ -150,29 +156,36 @@ test('--pid ', () => {
                     image: 'nginx:latest'
       `;
 
-    expect(Decomposerize(compose)).toMatchInlineSnapshot('"docker run -p 80:80 --pid host --name webserver nginx:latest"');
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(
+        '"docker run -p 80:80 --pid host --name webserver nginx:latest"',
+    );
 });
 
 test('--ulimit (https://github.com/magicmark/composerize/pull/262)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             nginx:
                 ulimits:
                     as: 1024
                 image: 'nginx:latest'
-    `)).toMatchInlineSnapshot('"docker run --ulimit as=1024 nginx:latest"');
+    `),
+    ).toMatchInlineSnapshot('"docker run --ulimit as=1024 nginx:latest"');
 
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             nginx:
                 ulimits:
                     nproc: 3
                 image: 'nginx:latest'
-    `)).toMatchInlineSnapshot('"docker run --ulimit nproc=3 nginx:latest"');
+    `),
+    ).toMatchInlineSnapshot('"docker run --ulimit nproc=3 nginx:latest"');
 
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             nginx:
@@ -181,10 +194,12 @@ test('--ulimit (https://github.com/magicmark/composerize/pull/262)', () => {
                         soft: 1023
                         hard: 1025
                 image: 'nginx:latest'
-    `)).toMatchInlineSnapshot('"docker run --ulimit nofile=1023:1025 nginx:latest"');
+    `),
+    ).toMatchInlineSnapshot('"docker run --ulimit nofile=1023:1025 nginx:latest"');
 
     // @see https://docs.docker.com/compose/compose-file/#ulimits
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             nginx:
@@ -194,12 +209,13 @@ test('--ulimit (https://github.com/magicmark/composerize/pull/262)', () => {
                         soft: 20000
                         hard: 40000
                 image: 'nginx:latest'
-    `))
-        .toMatchInlineSnapshot('"docker run --ulimit nproc=65535 --ulimit nofile=20000:40000 nginx:latest"');
+    `),
+    ).toMatchInlineSnapshot('"docker run --ulimit nproc=65535 --ulimit nofile=20000:40000 nginx:latest"');
 });
 
 test('-it image name (https://github.com/magicmark/composerize/issues/544)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ctfd:
@@ -208,8 +224,9 @@ test('-it image name (https://github.com/magicmark/composerize/issues/544)', () 
                 stdin_open: true
                 tty: true
                 image: ctfd/ctfd
-    `)).toMatchInlineSnapshot('"docker run -p 8000:8000 -i -t ctfd/ctfd"');
-    });
+    `),
+    ).toMatchInlineSnapshot('"docker run -p 8000:8000 -i -t ctfd/ctfd"');
+});
 
 test('command name (https://github.com/magicmark/composerize/issues/549)', () => {
     expect(
@@ -226,13 +243,16 @@ test('command name (https://github.com/magicmark/composerize/issues/549)', () =>
                 privileged: true
                 image: tailscale/tailscale
                 command: tailscaled
-    `
+    `,
         ),
-    ).toMatchInlineSnapshot('"docker run --net host --name tailscaled -v /var/lib:/var/lib -v /dev/net/tun:/dev/net/tun --privileged tailscale/tailscale tailscaled"');
-    });
+    ).toMatchInlineSnapshot(
+        '"docker run --net host --name tailscaled -v /var/lib:/var/lib -v /dev/net/tun:/dev/net/tun --privileged tailscale/tailscale tailscaled"',
+    );
+});
 
 test('gpus all (https://github.com/magicmark/composerize/issues/550)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ai-art:
@@ -252,12 +272,13 @@ test('gpus all (https://github.com/magicmark/composerize/issues/550)', () => {
                 volumes:
                     - '/opt/ai-art:/data'
                 image: overshard/ai-art
-    `))
-        .toMatchInlineSnapshot('"docker run -i -t --gpus all -p 3000:3000 -v /opt/ai-art:/data overshard/ai-art"');
-    });
+    `),
+    ).toMatchInlineSnapshot('"docker run -i -t --gpus all -p 3000:3000 -v /opt/ai-art:/data overshard/ai-art"');
+});
 
 test('gpus 1 (https://github.com/magicmark/composerize/issues/550)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ai-art:
@@ -277,9 +298,9 @@ test('gpus 1 (https://github.com/magicmark/composerize/issues/550)', () => {
                 volumes:
                     - '/opt/ai-art:/data'
                 image: overshard/ai-art
-    `))
-        .toMatchInlineSnapshot('"docker run -i -t --gpus 1 -p 3000:3000 -v /opt/ai-art:/data overshard/ai-art"');
-    });
+    `),
+    ).toMatchInlineSnapshot('"docker run -i -t --gpus 1 -p 3000:3000 -v /opt/ai-art:/data overshard/ai-art"');
+});
 
 test('command name (https://github.com/magicmark/composerize/issues/538)', () => {
     expect(
@@ -295,9 +316,11 @@ test('command name (https://github.com/magicmark/composerize/issues/538)', () =>
                     - KEYCLOAK_ADMIN_PASSWORD=admin
                 image: 'quay.io/keycloak/keycloak:18.0.2'
                 command: start-dev
-    `
+    `,
         ),
-    ).toMatchInlineSnapshot('"docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:18.0.2 start-dev"');
+    ).toMatchInlineSnapshot(
+        '"docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:18.0.2 start-dev"',
+    );
 });
 
 test('command args (https://github.com/magicmark/composerize/issues/484)', () => {
@@ -315,18 +338,26 @@ test('command args (https://github.com/magicmark/composerize/issues/484)', () =>
                 container_name: opcplc
                 image: 'mcr.microsoft.com/iotedge/opc-plc:latest'
                 command: '--pn=50000 --autoaccept --nospikes --nodips --nopostrend --nonegtrend --nodatavalues --sph --sn=25 --sr=10 --st=uint --fn=5 --fr=1 --ft=uint'
-    `,{rm:true}
+    `,
+            { rm: true },
         ),
-    ).toMatchInlineSnapshot('"docker run --rm -i -t -p 50000:50000 -p 8080:8080 --name opcplc mcr.microsoft.com/iotedge/opc-plc:latest --pn=50000 --autoaccept --nospikes --nodips --nopostrend --nonegtrend --nodatavalues --sph --sn=25 --sr=10 --st=uint --fn=5 --fr=1 --ft=uint"');
+    ).toMatchInlineSnapshot(
+        '"docker run --rm -i -t -p 50000:50000 -p 8080:8080 --name opcplc mcr.microsoft.com/iotedge/opc-plc:latest --pn=50000 --autoaccept --nospikes --nodips --nopostrend --nonegtrend --nodatavalues --sph --sn=25 --sr=10 --st=uint --fn=5 --fr=1 --ft=uint"',
+    );
 });
 
 test('basic image (https://github.com/magicmark/composerize/issues/542)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(
+            `
         version: '3.3'
         services:
             ubuntu:
                 image: ubuntu
-    `,{detach:true})).toMatchInlineSnapshot('"docker run -d ubuntu"');
+    `,
+            { detach: true },
+        ),
+    ).toMatchInlineSnapshot('"docker run -d ubuntu"');
 });
 
 test('volumes declaration (https://github.com/magicmark/composerize/issues/524)', () => {
@@ -347,9 +378,11 @@ test('volumes declaration (https://github.com/magicmark/composerize/issues/524)'
                 image: ypopovych/readymedia
         volumes:
             readymediacache:
-    `
+    `,
         ),
-    ).toMatchInlineSnapshot('"docker run --net host --restart unless-stopped --name readymedia1 -v /my/video/path:/media -v readymediacache:/cache -e VIDEO_DIR1=/media/my_video_files ypopovych/readymedia"');
+    ).toMatchInlineSnapshot(
+        '"docker run --net host --restart unless-stopped --name readymedia1 -v /my/video/path:/media -v readymediacache:/cache -e VIDEO_DIR1=/media/my_video_files ypopovych/readymedia"',
+    );
 });
 
 test('tmpfs (https://github.com/magicmark/composerize/issues/536)', () => {
@@ -370,13 +403,16 @@ test('tmpfs (https://github.com/magicmark/composerize/issues/536)', () => {
                 container_name: monitoring
                 restart: always
                 image: 'checkmk/check-mk-raw:2.0.0-latest'
-    `
+    `,
         ),
-    ).toMatchInlineSnapshot('"docker run -i -t -p 8080:5000 --tmpfs /opt/omd/sites/cmk/tmp:uid=1000,gid=1000 -v /omd/sites -v /etc/localtime:/etc/localtime:ro --name monitoring --restart always checkmk/check-mk-raw:2.0.0-latest"');
+    ).toMatchInlineSnapshot(
+        '"docker run -i -t -p 8080:5000 --tmpfs /opt/omd/sites/cmk/tmp:uid=1000,gid=1000 -v /omd/sites -v /etc/localtime:/etc/localtime:ro --name monitoring --restart always checkmk/check-mk-raw:2.0.0-latest"',
+    );
 });
 
 test('mount type (https://github.com/magicmark/composerize/issues/412)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             nginx:
@@ -386,12 +422,13 @@ test('mount type (https://github.com/magicmark/composerize/issues/412)', () => {
                         source: ./logs
                         target: /usr/src/app/logs
                 image: nginx
-    `))
-        .toMatchInlineSnapshot('"docker run --mount type=bind,source=./logs,target=/usr/src/app/logs nginx"');
+    `),
+    ).toMatchInlineSnapshot('"docker run --mount type=bind,source=./logs,target=/usr/src/app/logs nginx"');
 });
 
 test('mount type multi (https://github.com/magicmark/composerize/issues/412)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             nginx:
@@ -405,24 +442,28 @@ test('mount type multi (https://github.com/magicmark/composerize/issues/412)', (
                         source: ./data
                         target: /usr/src/app/data
                 image: nginx
-    `))
-        .toMatchInlineSnapshot('"docker run --mount type=bind,source=./logs,target=/usr/src/app/logs --mount type=bind,source=./data,target=/usr/src/app/data nginx"');
+    `),
+    ).toMatchInlineSnapshot(
+        '"docker run --mount type=bind,source=./logs,target=/usr/src/app/logs --mount type=bind,source=./data,target=/usr/src/app/data nginx"',
+    );
 });
 
 test('cgroup (https://github.com/magicmark/composerize/issues/561)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             systemd_test:
                 cgroup_parent: docker.slice
                 cgroup: private
                 image: systemd_test
-    `))
-        .toMatchInlineSnapshot('"docker run --cgroup-parent docker.slice --cgroupns private systemd_test"');
+    `),
+    ).toMatchInlineSnapshot('"docker run --cgroup-parent docker.slice --cgroupns private systemd_test"');
 });
 
 test('cpu/share, ip (https://github.com/magicmark/composerize/issues/545)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             postgis:
@@ -451,12 +492,16 @@ test('cpu/share, ip (https://github.com/magicmark/composerize/issues/545)', () =
             postgres_net:
                 external:
                     name: postgres_net
-    `))
-        .toMatchInlineSnapshot('"docker run --net postgres_net --restart always -p 5432:5432 --ip 172.18.0.100 --name postgres2 --cpus 3 -c 512 --log-driver json-file --log-opt max-size=100m,max-file=10 -v /srv/postgres:/var/lib/postgresql/data postgis/postgis"');
+    `),
+    ).toMatchInlineSnapshot(
+        '"docker run --net postgres_net --restart always -p 5432:5432 --ip 172.18.0.100 --name postgres2 --cpus 3 -c 512 --log-driver json-file --log-opt max-size=100m,max-file=10 -v /srv/postgres:/var/lib/postgresql/data postgis/postgis"',
+    );
 });
-   
+
 test('port', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(
+            `
         version: '3.3'
         services:
             neo4j:
@@ -472,12 +517,18 @@ test('port', () => {
                 environment:
                     - NEO4J_AUTH=neo4j/test
                 image: 'neo4j:latest'
-    `,{detach:true}))
-        .toMatchInlineSnapshot('"docker run -d --name testneo4j -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data -v $HOME/neo4j/logs:/logs -v $HOME/neo4j/import:/var/lib/neo4j/import -v $HOME/neo4j/plugins:/plugins -e NEO4J_AUTH=neo4j/test neo4j:latest"');
+    `,
+            { detach: true },
+        ),
+    ).toMatchInlineSnapshot(
+        '"docker run -d --name testneo4j -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data -v $HOME/neo4j/logs:/logs -v $HOME/neo4j/import:/var/lib/neo4j/import -v $HOME/neo4j/plugins:/plugins -e NEO4J_AUTH=neo4j/test neo4j:latest"',
+    );
 });
 
 test('ip, mac, hostname, network (https://github.com/magicmark/composerize/issues/359)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(
+            `
         version: '3.3'
         services:
             image:
@@ -502,12 +553,17 @@ test('ip, mac, hostname, network (https://github.com/magicmark/composerize/issue
             homenet:
                 external:
                     name: homenet
-    `,{detach:true}))
-        .toMatchInlineSnapshot('"docker run -d --net homenet --name test --restart always --ip6 xxxxx --ip 192.168.1.9 --mac-address 00:00:00:00:00:09 -h myhost -v /import/settings:/settings -v /import/media:/media -p 8080:8080 -e UID=1000 -e GID=1000 repo/image"');
+    `,
+            { detach: true },
+        ),
+    ).toMatchInlineSnapshot(
+        '"docker run -d --net homenet --name test --restart always --ip6 xxxxx --ip 192.168.1.9 --mac-address 00:00:00:00:00:09 -h myhost -v /import/settings:/settings -v /import/media:/media -p 8080:8080 -e UID=1000 -e GID=1000 repo/image"',
+    );
 });
 
 test('-w working_dir', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             sbt:
@@ -520,12 +576,15 @@ test('-w working_dir', () => {
                 working_dir: /app
                 image: mozilla/sbt
                 command: 'sbt shell'
-    `))
-        .toMatchInlineSnapshot('"docker run -t -i -v ~/.ivy2:/root/.ivy2 -v ~/.sbt:/root/.sbt -v $PWD:/app -w /app mozilla/sbt sbt shell"');
+    `),
+    ).toMatchInlineSnapshot(
+        '"docker run -t -i -v ~/.ivy2:/root/.ivy2 -v ~/.sbt:/root/.sbt -v $PWD:/app -w /app mozilla/sbt sbt shell"',
+    );
 });
 
 test('private registry (https://github.com/magicmark/composerize/issues/15)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             mongo:
@@ -540,12 +599,16 @@ test('private registry (https://github.com/magicmark/composerize/issues/15)', ()
                 volumes:
                     - '~/jat/mongodata:/data/db'
                 image: registry.cloud.local/js/mongo
-    `))
-        .toMatchInlineSnapshot('"docker run --restart always --privileged --name jatdb -p 27017:27017 -p 28017:28017 -e MONGODB_PASS=somepass -v ~/jat/mongodata:/data/db registry.cloud.local/js/mongo"');
+    `),
+    ).toMatchInlineSnapshot(
+        '"docker run --restart always --privileged --name jatdb -p 27017:27017 -p 28017:28017 -e MONGODB_PASS=somepass -v ~/jat/mongodata:/data/db registry.cloud.local/js/mongo"',
+    );
 });
 
 test('cap_add, cap_drop, pid, net, prviledged, device (https://github.com/magicmark/composerize/issues/30)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(
+            `
         version: '3.3'
         services:
             node:
@@ -568,12 +631,17 @@ test('cap_add, cap_drop, pid, net, prviledged, device (https://github.com/magicm
                     - '/run/docker/plugins:/run/docker/plugins'
                 image: 'storageos/node:0.10.0'
                 command: server
-    `,{'detach':true}))
-        .toMatchInlineSnapshot('"docker run -d --net host --name storageos -e HOSTNAME -e ADVERTISE_IP=xxx.xxx.xxx.xxx -e JOIN=xxxxxxxxxxxxxxxxx --pid host --privileged --cap-add SYS_ADMIN --cap-drop XXX --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins storageos/node:0.10.0 server"');
+    `,
+            { detach: true },
+        ),
+    ).toMatchInlineSnapshot(
+        '"docker run -d --net host --name storageos -e HOSTNAME -e ADVERTISE_IP=xxx.xxx.xxx.xxx -e JOIN=xxxxxxxxxxxxxxxxx --pid host --privileged --cap-add SYS_ADMIN --cap-drop XXX --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins storageos/node:0.10.0 server"',
+    );
 });
 
 test('publish-all (https://github.com/magicmark/composerize/issues/19)', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         # ignored options for 'frontail'
         # -P
         version: '3.3'
@@ -583,12 +651,13 @@ test('publish-all (https://github.com/magicmark/composerize/issues/19)', () => {
                     - '/var/log:/log'
                 image: mthenw/frontail
                 command: /log/syslog
-            `))
-        .toMatchInlineSnapshot('"docker run -v /var/log:/log mthenw/frontail /log/syslog"');
+            `),
+    ).toMatchInlineSnapshot('"docker run -v /var/log:/log mthenw/frontail /log/syslog"');
 });
 
 test('storage-opt multi', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             fedora:
@@ -596,24 +665,26 @@ test('storage-opt multi', () => {
                     size: 120G
                     dummy: xxx
                 image: fedora
-            `))
-        .toMatchInlineSnapshot('"docker run --storage-opt size=120G,dummy=xxx fedora"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --storage-opt size=120G,dummy=xxx fedora"');
 });
 
 test('storage-opt simple', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             fedora:
                 storage_opt:
                     size: 120G
                 image: fedora
-            `))
-        .toMatchInlineSnapshot('"docker run --storage-opt size=120G fedora"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --storage-opt size=120G fedora"');
 });
 
 test('--sysctl', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             someimage:
@@ -621,12 +692,13 @@ test('--sysctl', () => {
                     - net.core.somaxconn=1024
                     - net.ipv4.tw_reuse=1
                 image: someimage
-            `))
-        .toMatchInlineSnapshot('"docker run --sysctl net.core.somaxconn=1024 --sysctl net.ipv4.tw_reuse=1 someimage"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --sysctl net.core.somaxconn=1024 --sysctl net.ipv4.tw_reuse=1 someimage"');
 });
 
 test('dns, link, add host', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             container:
@@ -643,12 +715,15 @@ test('dns, link, add host', () => {
                     - '2.example2.com:10.0.0.2'
                     - '3.example.com:10.0.0.3'
                 image: my/container
-            `))
-        .toMatchInlineSnapshot('"docker run --dns 8.8.8.8 --dns 127.0.0.1 --dns-search domain.com --dns-opt attempts:10 --link other_container --add-host 2.example2.com:10.0.0.2 --add-host 3.example.com:10.0.0.3 my/container"');
+            `),
+    ).toMatchInlineSnapshot(
+        '"docker run --dns 8.8.8.8 --dns 127.0.0.1 --dns-search domain.com --dns-opt attempts:10 --link other_container --add-host 2.example2.com:10.0.0.2 --add-host 3.example.com:10.0.0.3 my/container"',
+    );
 });
 
 test('--env-file', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -656,12 +731,13 @@ test('--env-file', () => {
                     - ./env.list
                 image: ubuntu
                 command: bash
-            `))
-        .toMatchInlineSnapshot('"docker run --env-file ./env.list ubuntu bash"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --env-file ./env.list ubuntu bash"');
 });
 
 test('--expose ', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -669,12 +745,13 @@ test('--expose ', () => {
                     - 1500-1505
                     - 80
                 image: ubuntu
-            `))
-        .toMatchInlineSnapshot('"docker run --expose 1500-1505 --expose 80 ubuntu"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --expose 1500-1505 --expose 80 ubuntu"');
 });
 
 test('--ipc --init --userns --uts -u --group-add --oom-kill-disable --oom-score-adj --stop-signal --stop-timeout', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -690,12 +767,15 @@ test('--ipc --init --userns --uts -u --group-add --oom-kill-disable --oom-score-
                 stop_signal: SIG_TERM
                 stop_grace_period: 2s
                 image: ubuntu
-            `))
-        .toMatchInlineSnapshot('"docker run --ipc shareable --init --userns host --uts uuu -u user1 --group-add groupX --oom-kill-disable --oom-score-adj xxx --stop-signal SIG_TERM --stop-timeout 2s ubuntu"');
+            `),
+    ).toMatchInlineSnapshot(
+        '"docker run --ipc shareable --init --userns host --uts uuu -u user1 --group-add groupX --oom-kill-disable --oom-score-adj xxx --stop-signal SIG_TERM --stop-timeout 2s ubuntu"',
+    );
 });
 
 test('--label', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -704,12 +784,13 @@ test('--label', () => {
                     - com.example.foo=bar
                 image: ubuntu
                 command: bash
-            `))
-        .toMatchInlineSnapshot('"docker run -l my-label -l com.example.foo=bar ubuntu bash"');
+            `),
+    ).toMatchInlineSnapshot('"docker run -l my-label -l com.example.foo=bar ubuntu bash"');
 });
 
 test('deploy limits', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -731,12 +812,15 @@ test('deploy limits', () => {
                 volume_from:
                     - other2
                 image: ubuntu
-            `))
-        .toMatchInlineSnapshot('"docker run --cpus 1.5 --memory-reservation 12G -m 15G --pids-limit 1500 --shm-size 15G --memory-swap yyy --memory-swappiness zzz --cpu-period xxx --cpu-quota xxx --cpu-rt-period xxx --cpu-rt-runtime xxx --volumes-from other2 ubuntu"');
+            `),
+    ).toMatchInlineSnapshot(
+        '"docker run --cpus 1.5 --memory-reservation 12G -m 15G --pids-limit 1500 --shm-size 15G --memory-swap yyy --memory-swappiness zzz --cpu-period xxx --cpu-quota xxx --cpu-rt-period xxx --cpu-rt-runtime xxx --volumes-from other2 ubuntu"',
+    );
 });
 
 test('--pull --runtime --platform --isolation', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -745,12 +829,13 @@ test('--pull --runtime --platform --isolation', () => {
                 platform: linux
                 isolation: yyy
                 image: ubuntu
-            `))
-        .toMatchInlineSnapshot('"docker run --pull always --runtime xxx --platform linux --isolation yyy ubuntu"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --pull always --runtime xxx --platform linux --isolation yyy ubuntu"');
 });
 
 test('--network-alias --link-local-ip', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -765,12 +850,13 @@ test('--network-alias --link-local-ip', () => {
             reseau:
                 external:
                     name: reseau
-            `))
-        .toMatchInlineSnapshot('"docker run --net reseau --link-local-ip 192.168.0.1 --net-alias ubuntu_res ubuntu"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --net reseau --link-local-ip 192.168.0.1 --net-alias ubuntu_res ubuntu"');
 });
 
 test('--entrypoint', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -779,12 +865,13 @@ test('--entrypoint', () => {
                 healthcheck:
                     disable: true
                 image: ubuntu
-            `))
-        .toMatchInlineSnapshot('"docker run --entrypoint /bin/bash --no-healthcheck ubuntu"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --entrypoint /bin/bash --no-healthcheck ubuntu"');
 });
 
 test('--security-opt', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             fedora:
@@ -794,12 +881,13 @@ test('--security-opt', () => {
                 tty: true
                 image: fedora
                 command: bash
-            `))
-        .toMatchInlineSnapshot('"docker run --security-opt label:level:s0:c100,c200 -i -t fedora bash"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --security-opt label:level:s0:c100,c200 -i -t fedora bash"');
 });
 
 test('blkio 1 device', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -828,12 +916,15 @@ test('blkio 1 device', () => {
                             path: /dev/sda
                             rate: 1000
                 image: ubuntu
-            `))
-        .toMatchInlineSnapshot('"docker run -i -t --blkio-weight 16 --blkio-weight-device /dev/sda:200 --device-read-bps /dev/sda:1mb --device-read-iops /dev/sda:1000 --device-write-bps /dev/sda:1mb --device-write-iops /dev/sda:1000 ubuntu"');
+            `),
+    ).toMatchInlineSnapshot(
+        '"docker run -i -t --blkio-weight 16 --blkio-weight-device /dev/sda:200 --device-read-bps /dev/sda:1mb --device-read-iops /dev/sda:1000 --device-write-bps /dev/sda:1mb --device-write-iops /dev/sda:1000 ubuntu"',
+    );
 });
 
 test('blkio 2 device', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             ubuntu:
@@ -868,12 +959,15 @@ test('blkio 2 device', () => {
                             path: /dev/sda
                             rate: 1000
                 image: ubuntu
-            `))
-        .toMatchInlineSnapshot('"docker run -i -t --blkio-weight 16 --blkio-weight-device /dev/sda:200 --blkio-weight-device /dev/sdb:300 --device-read-bps /dev/sda:1mb --device-read-bps /dev/sdb:2mb --device-read-iops /dev/sda:1000 --device-write-bps /dev/sda:1mb --device-write-iops /dev/sda:1000 ubuntu"');
+            `),
+    ).toMatchInlineSnapshot(
+        '"docker run -i -t --blkio-weight 16 --blkio-weight-device /dev/sda:200 --blkio-weight-device /dev/sdb:300 --device-read-bps /dev/sda:1mb --device-read-bps /dev/sdb:2mb --device-read-iops /dev/sda:1000 --device-write-bps /dev/sda:1mb --device-write-iops /dev/sda:1000 ubuntu"',
+    );
 });
 
 test('--device-cgroup-rule', () => {
-    expect(Decomposerize(`
+    expect(
+        Decomposerize(`
         version: '3.3'
         services:
             my-image:
@@ -881,8 +975,8 @@ test('--device-cgroup-rule', () => {
                     - 'c 42:* rmw'
                 container_name: my-container
                 image: my-image
-            `))
-        .toMatchInlineSnapshot('"docker run --device-cgroup-rule \\"c 42:* rmw\\" --name my-container my-image"');
+            `),
+    ).toMatchInlineSnapshot('"docker run --device-cgroup-rule \\"c 42:* rmw\\" --name my-container my-image"');
 });
 
 test('--healthcheck-cmd ', () => {
@@ -897,8 +991,8 @@ test('--healthcheck-cmd ', () => {
                     start_period: 30s
                     retries: '2'
                 image: 'nginx:latest'
-      `
-        ;
-
-    expect(Decomposerize(compose)).toMatchInlineSnapshot('"docker run --health-cmd healthcheck.sh --health-interval 60s --health-retries 2 --health-start-period 30s --health-timeout 10s nginx:latest"');
+      `;
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(
+        '"docker run --health-cmd healthcheck.sh --health-interval 60s --health-retries 2 --health-start-period 30s --health-timeout 10s nginx:latest"',
+    );
 });
