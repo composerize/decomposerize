@@ -3,6 +3,9 @@
 
 const decomposerize = require('./dist/decomposerize');
 
-process.stdin.on("data", data => {
-	console.log(decomposerize(data.toString()));
-});
+var composeFile = '';
+process.stdin.on('data', function(d) {
+    composeFile += d;
+}).on('end', function() {
+	console.log(decomposerize(composeFile));
+}).setEncoding('utf8');
