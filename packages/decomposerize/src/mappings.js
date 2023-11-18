@@ -23,6 +23,7 @@ export type ArgType =
     | 'DeviceBlockIOConfigRate'
     | 'DeviceBlockIOConfigWeight'
     | 'MapArray'
+    | 'Networks'
     | 'Map'
     | 'Gpus';
 

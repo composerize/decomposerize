@@ -19,12 +19,12 @@ const getObjectByPath = (path: string, obj: any): any =>
 export type ArgValueSeparator = '=' | ' ';
 
 export type Configuration = {
-    command: string,
-    rm: boolean,
-    detach: boolean,
-    multiline: boolean,
-    'long-args': boolean,
-    'arg-value-separator': ArgValueSeparator,
+    command?: string,
+    rm?: boolean,
+    detach?: boolean,
+    multiline?: boolean,
+    'long-args'?: boolean,
+    'arg-value-separator'?: ArgValueSeparator,
 };
 
 export default (input: string, configuration: Configuration = {}): ?string => {
