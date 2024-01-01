@@ -15,10 +15,12 @@
   "devDependencies": {
     "@babel/cli": "^7.x",
     "@babel/core": "^7.x",
+    "@babel/eslint-parser": "^7.23.3",
     "@babel/plugin-proposal-private-property-in-object": "^7.x",
     "@babel/preset-env": "^7.x",
     "@babel/preset-flow": "^7.x",
     "@babel/preset-react": "^7.x",
+    "@stylistic/eslint-plugin-js": "^1.4.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^27.4.3",
@@ -30,6 +32,8 @@
     "eslint-formatter-codeframe": "^7.32.1",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "flow-bin": "^0.221.0",
     "husky": "^8.0.3",
     "identity-obj-proxy": "^3.0.0",
@@ -53,6 +57,6 @@
     "moduleNameMapper": {
       "styled-components/macro": "styled-components"
     },
-	"prettierPath": null
+    "prettierPath": null
   }
 }

@@ -1,7 +1,5 @@
 // @flow
 
-import 'core-js/fn/object/entries';
-
 import YAML from 'yaml';
 import Composeverter from 'composeverter';
 
@@ -79,7 +77,7 @@ export default (input: string, configuration: Configuration = {}): ?string => {
             });
 
         // $FlowFixMe: dynamic json object deconstruct
-        Object.keys(service).forEach(serviceOption => {
+        Object.keys(service).forEach((serviceOption) => {
             Object.entries(MAPPINGS).forEach(([argumentNames, mapping]) => {
                 // $FlowFixMe: dynamic json object deconstruct
                 const { type, path } = mapping;
@@ -93,7 +91,7 @@ export default (input: string, configuration: Configuration = {}): ?string => {
 
                 if (type === 'Array') {
                     // $FlowFixMe: supposed to be an array
-                    targetValue.forEach(v => {
+                    targetValue.forEach((v) => {
                         if (typeof v === 'object' || v === null) return;
 
                         pushOption(String(stringify(v)));
@@ -111,7 +109,6 @@ export default (input: string, configuration: Configuration = {}): ?string => {
                 if (type === 'Switch') {
                     // $FlowFixMe
                     if (targetValue.toString() === 'true') pushOption('');
-                    return;
                 }
                 if (type === 'Value') {
                     pushOption(stringify(targetValue));
@@ -124,21 +121,21 @@ export default (input: string, configuration: Configuration = {}): ?string => {
                 }
                 if (type === 'DeviceBlockIOConfigRate') {
                     // $FlowFixMe: supposed to be an array
-                    targetValue.forEach(v => {
+                    targetValue.forEach((v) => {
                         const { path: deviceIORatePath, rate } = v;
                         pushOption(String(`${deviceIORatePath}:${rate}`));
                     });
                 }
                 if (type === 'DeviceBlockIOConfigWeight') {
                     // $FlowFixMe: supposed to be an array
-                    targetValue.forEach(v => {
+                    targetValue.forEach((v) => {
                         const { path: deviceIOWeightPath, weight } = v;
                         pushOption(String(`${deviceIOWeightPath}:${weight}`));
                     });
                 }
                 if (type === 'MapArray') {
                     // $FlowFixMe: supposed to be an array
-                    targetValue.forEach(v => {
+                    targetValue.forEach((v) => {
                         if (typeof v !== 'object') return;
 
                         const mapValues = [];

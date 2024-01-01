@@ -5,6 +5,7 @@ import { uglify } from 'rollup-plugin-uglify';
 import replace from '@rollup/plugin-replace';
 import builtins from 'rollup-plugin-node-builtins';
 import globals from 'rollup-plugin-node-globals';
+import json from '@rollup/plugin-json';
 
 export default {
     input: 'src/index.js',
@@ -13,6 +14,7 @@ export default {
             include: ['src/**/*.js', 'node_modules/camelcase/**/*.js'],
 			babelHelpers: 'bundled',
         }),
+        json(),
         commonjs(),
         globals(),
         builtins(),

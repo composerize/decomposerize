@@ -19,7 +19,7 @@ export default class TextInput extends Component {
         return (
             <StyledInput
                 value={command}
-                onChange={e => {
+                onChange={(e) => {
                     this.handleChange(e);
                 }}
             />
