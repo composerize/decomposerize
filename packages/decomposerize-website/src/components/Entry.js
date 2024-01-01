@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components/macro';
 
 import Section from './Section';
-import TextInput from './TextInput';
+import LinedTextInput from './LinedTextInput';
 import Code from './Code';
 import CarbonAds from './CarbonAds';
 
@@ -53,7 +53,13 @@ export default function Entry(props) {
                             </a>
                         </p>
                     </Blurb>
-                    <TextInput command={props.command} onInputChange={props.onInputChange} />
+                    <LinedTextInput
+                        value={props.input}
+                        onValueChange={props.onInputChange}
+                        numOfLines={10}
+                        erroredLines={props.erroredLines}
+                    />
+                    <pre style={{ color: 'red' }}>{props.error}</pre>
                 </div>
                 <div
                     css={`

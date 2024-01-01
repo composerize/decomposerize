@@ -29,6 +29,7 @@ export default class Main extends Component {
             input: defaultCommand,
             output: Decomposerize(defaultCommand),
             error: '',
+            erroredLines: [],
         };
         this.onInputChange = this.onInputChange.bind(this);
     }
@@ -41,15 +42,18 @@ export default class Main extends Component {
     }
 
     updateConversion() {
-        this.setState(state => {
+        this.setState((state) => {
             try {
                 return {
                     output: Decomposerize(state.input),
                     error: '',
+                    erroredLines: [],
                 };
             } catch (e) {
                 return {
                     error: e.toString(),
+                    output: '#see error message(s)',
+                    erroredLines: e.lines,
                 };
             }
         });
@@ -59,8 +63,13 @@ export default class Main extends Component {
         return (
             <div>
                 <Header />
-                <Entry command={this.state.input} onInputChange={this.onInputChange} />
-                <Output output={this.state.output} error={this.state.error} />
+                <Entry
+                    input={this.state.input}
+                    onInputChange={this.onInputChange}
+                    error={this.state.error}
+                    erroredLines={this.state.erroredLines}
+                />
+                <Output output={this.state.output} />
                 <Footer />
             </div>
         );
