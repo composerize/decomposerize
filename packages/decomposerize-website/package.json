@@ -5,7 +5,7 @@
   "homepage": "https://www.decomposerize.com",
   "dependencies": {
     "babel-plugin-styled-components": "^1.10.7",
-    "decomposerize": "*",
+    "decomposerize": "latest",
     "html5-boilerplate": "^7.2.0",
     "normalize.css": "^8.0.1",
     "react": "16.x",
