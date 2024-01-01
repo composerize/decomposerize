@@ -6,8 +6,13 @@
 - [ ] bug report
 
 **Please provide a sample input docker run command**
-```
-docker run foo bar
+```yaml
+nginx:
+    ports:
+        - '80:80'
+    volumes:
+        - '/var/run/docker.sock:/tmp/docker.sock:ro'
+    image: nginx
 ```
 
 **What is the current output?***
@@ -19,14 +24,5 @@ some output
 ```
 some better output
 ```
-
-**Are you willing/able to attempt a fix?**
-
-Most issues can be trivially addressed by updating this mapping: 
-
-https://github.com/magicmark/decomposerize/blob/dcae8ace865e2eef69e5bd27c4a9a320f56cac75/packages/decomposerize/src/mappings.js#L62-L66
-
-- [ ] Is this the case for your issue?
-- [ ] Would you be able to try? :) 
 
 Thanks for following this template and making decomposerize better for everyone else too!

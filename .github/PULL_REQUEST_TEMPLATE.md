@@ -2,10 +2,18 @@
 
 ## Example
 
-**Input:** `docker run foo bar baz`
+**Input:**
+```yaml
+nginx:
+    ports:
+        - '80:80'
+    volumes:
+        - '/var/run/docker.sock:/tmp/docker.sock:ro'
+    image: nginx
+```
 **Output:**
 ```yaml
-<!-- Paste the output of the above command in here -->
+<!-- Paste the output of the above in here -->
 ```
 
 ## Relevant Docker Documentation
