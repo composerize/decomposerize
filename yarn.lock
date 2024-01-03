@@ -4323,9 +4323,9 @@ compare-func@^2.0.0:
     dot-prop "^5.1.0"
 
 composeverter@latest:
-  version "1.5.3"
-  resolved "https://registry.yarnpkg.com/composeverter/-/composeverter-1.5.3.tgz#8bcc7023b4b459d72fe6b1eb9848e6b78956fa5f"
-  integrity sha512-gJG0DsuMH76Yprrl7jXzULu3TPszIW1EYebDpyNTXHC1853wsnV0EMrMkT2tZfzgpPiFu7e+p37YMgYtmCVbhQ==
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/composeverter/-/composeverter-1.6.0.tgz#425f5567b158c4f1da6ff3c4b3b647e5507e8836"
+  integrity sha512-VYVTra2QBgkrvN7c5975oFltUxNugaMG1pgxHWtYqjqDIhO8cYM6+TKyYCXTs3+8PQ98hJ8hDgRPI6zNbrCrMg==
   dependencies:
     ajv "^8.x"
     ajv-errors "^3.x"
