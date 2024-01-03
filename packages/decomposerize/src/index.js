@@ -1,6 +1,5 @@
 // @flow
 
-import YAML from 'yaml';
 import Composeverter from 'composeverter';
 
 import { MAPPINGS } from './mappings';
@@ -26,7 +25,8 @@ export type Configuration = {
 };
 
 export default (input: string, configuration: Configuration = {}): ?string => {
-    const composeJson = YAML.parse(Composeverter.migrateToCommonSpec(input));
+    const composeJson = Composeverter.yamlParse(Composeverter.migrateToCommonSpec(input));
+    if (!composeJson || !composeJson.services) return '';
     const defaultConfiguration = {
         command: 'docker run',
         rm: false,

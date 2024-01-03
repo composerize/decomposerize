@@ -2,27 +2,23 @@
 
 import Decomposerize from '../src';
 
-test('fails with invalid yaml', () => {
-    expect(() => {
-        Decomposerize('foo bar"');
-    }).toThrow();
+test('return empty when invalid yaml', () => {
+    expect(Decomposerize('foo bar"')).toMatchInlineSnapshot(`""`);
 });
 
-test('fails with empty yaml', () => {
-    expect(() => {
-        Decomposerize('#xxx"');
-    }).toThrow();
+test('return empty when empty yaml', () => {
+    expect(Decomposerize('#xxx"')).toMatchInlineSnapshot(`""`);
 });
 
-test('fails with no services yaml', () => {
-    expect(() => {
+test('return empty when no services yaml', () => {
+    expect(
         Decomposerize(`
     # ignored : docker stop
 
     version: '3.3'
     services:
-  `);
-    }).toThrow();
+  `),
+    ).toMatchInlineSnapshot(`""`);
 });
 
 test('multiple docker run command', () => {
