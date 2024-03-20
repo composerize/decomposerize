@@ -381,7 +381,10 @@ test('volumes declaration (https://github.com/magicmark/composerize/issues/524)'
     `,
         ),
     ).toMatchInlineSnapshot(
-        '"docker run --net host --restart unless-stopped --name readymedia1 -v /my/video/path:/media -v readymediacache:/cache -e VIDEO_DIR1=/media/my_video_files ypopovych/readymedia"',
+        `
+"docker volume create readymediacache
+docker run --net host --restart unless-stopped --name readymedia1 -v /my/video/path:/media -v readymediacache:/cache -e VIDEO_DIR1=/media/my_video_files ypopovych/readymedia"
+`,
     );
 });
 
@@ -494,7 +497,10 @@ test('cpu/share, ip (https://github.com/magicmark/composerize/issues/545)', () =
                     name: postgres_net
     `),
     ).toMatchInlineSnapshot(
-        '"docker run --net postgres_net --restart always -p 5432:5432 --ip 172.18.0.100 --name postgres2 --cpus 3 -c 512 --log-driver json-file --log-opt max-size=100m,max-file=10 -v /srv/postgres:/var/lib/postgresql/data postgis/postgis"',
+        `
+"docker network create postgres_net
+docker run --net postgres_net --restart always -p 5432:5432 --ip 172.18.0.100 --name postgres2 --cpus 3 -c 512 --log-driver json-file --log-opt max-size=100m,max-file=10 -v /srv/postgres:/var/lib/postgresql/data postgis/postgis"
+`,
     );
 });
 
@@ -557,7 +563,10 @@ test('ip, mac, hostname, network (https://github.com/magicmark/composerize/issue
             { detach: true },
         ),
     ).toMatchInlineSnapshot(
-        '"docker run -d --net homenet --name test --restart always --ip6 xxxxx --ip 192.168.1.9 --mac-address 00:00:00:00:00:09 -h myhost -v /import/settings:/settings -v /import/media:/media -p 8080:8080 -e UID=1000 -e GID=1000 repo/image"',
+        `
+"docker network create homenet
+docker run -d --net homenet --name test --restart always --ip6 xxxxx --ip 192.168.1.9 --mac-address 00:00:00:00:00:09 -h myhost -v /import/settings:/settings -v /import/media:/media -p 8080:8080 -e UID=1000 -e GID=1000 repo/image"
+`,
     );
 });
 
@@ -851,7 +860,12 @@ test('--network-alias --link-local-ip', () => {
                 external:
                     name: reseau
             `),
-    ).toMatchInlineSnapshot('"docker run --net reseau --link-local-ip 192.168.0.1 --net-alias ubuntu_res ubuntu"');
+    ).toMatchInlineSnapshot(
+        `
+"docker network create reseau
+docker run --net reseau --link-local-ip 192.168.0.1 --net-alias ubuntu_res ubuntu"
+`,
+    );
 });
 
 test('--entrypoint', () => {
@@ -995,4 +1009,242 @@ test('--healthcheck-cmd ', () => {
     expect(Decomposerize(compose)).toMatchInlineSnapshot(
         '"docker run --health-cmd healthcheck.sh --health-interval 60s --health-retries 2 --health-start-period 30s --health-timeout 10s nginx:latest"',
     );
+});
+
+test('#40 (bug)', () => {
+    const compose = `
+    version: "3"
+
+    volumes:
+      polyfill-cache:
+        driver: juicedata/juicefs
+        driver_opts:
+          name: polyfill-cache
+          metaurl: postgres://postgres:\${META_PASSWORD}@meta-server:5432/juicefs
+          storage: \${STORAGE_TYPE}
+          bucket: \${BUCKET}
+          access-key: \${ACCESS_KEY}
+          secret-key: \${SECRET_KEY}
+    
+    networks:
+      polyfiller:
+    
+    services:
+      autoheal:
+        image: willfarrell/autoheal:1.2.0
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        restart: always
+    
+      meta-server:
+        depends_on:
+          - autoheal
+        image: postgres
+        environment:
+          - POSTGRES_USER=postgres
+          - POSTGRES_DB=juicefs
+          - POSTGRES_PASSWORD=\${META_PASSWORD}
+        volumes:
+          - ./data:/var/lib/postgresql/data/
+        networks:
+          - polyfiller
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          interval: 3s
+          retries: 5
+        labels:
+          - autoheal=true
+        restart: always
+    
+      api-service:
+        depends_on:
+          - autoheal
+          - meta-server
+        image: polyfiller/api-service
+        environment:
+          - NODE_ENV=production
+        volumes:
+          - polyfill-cache:/tmp/@wessberg/polyfiller
+        networks:
+          - polyfiller
+        healthcheck:
+          test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
+          interval: 300000000s
+          retries: 5
+          start_period: 30s
+        labels:
+          - autoheal=true
+        restart: always
+        logging:
+          driver: json-file
+          options:
+            max-size: 10m
+    
+      caddy:
+        depends_on:
+          - api-service
+        image: caddy
+        ports:
+          - 80:80
+          - 443:443
+        networks:
+          - polyfiller
+        restart: always
+        command: caddy reverse-proxy --from polyfiller.app --to api-service:3000
+      `;
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(`
+"docker network create polyfiller
+docker volume create -d juicedata/juicefs -o name=polyfill-cache -o metaurl=postgres://postgres:\${META_PASSWORD}@meta-server:5432/juicefs -o storage=\${STORAGE_TYPE} -o bucket=\${BUCKET} -o access-key=\${ACCESS_KEY} -o secret-key=\${SECRET_KEY} polyfill-cache
+docker run -v /var/run/docker.sock:/var/run/docker.sock --restart always willfarrell/autoheal:1.2.0
+docker run --net polyfiller -e POSTGRES_USER=postgres -e POSTGRES_DB=juicefs -e POSTGRES_PASSWORD=\${META_PASSWORD} -v ./data:/var/lib/postgresql/data/ --health-cmd \\"CMD-SHELL,pg_isready -U postgres\\" --health-interval 3s --health-retries 5 -l autoheal=true --restart always postgres
+docker run --net polyfiller -e NODE_ENV=production -v polyfill-cache:/tmp/@wessberg/polyfiller --health-cmd \\"CMD-SHELL,curl -f http://localhost:3000/ || exit 1\\" --health-interval 300000000s --health-retries 5 --health-start-period 30s -l autoheal=true --restart always --log-driver json-file --log-opt max-size=10m polyfiller/api-service
+docker run --net polyfiller -p 80:80 -p 443:443 --restart always caddy caddy reverse-proxy --from polyfiller.app --to api-service:3000"
+`);
+});
+
+test('#40 (enhancements)', () => {
+    const compose = `
+    version: "3"
+
+    volumes:
+      polyfill-cache:
+        driver: juicedata/juicefs
+        driver_opts:
+          name: polyfill-cache
+          metaurl: postgres://postgres:\${META_PASSWORD}@meta-server:5432/juicefs
+          storage: \${STORAGE_TYPE}
+          bucket: \${BUCKET}
+          access-key: \${ACCESS_KEY}
+          secret-key: \${SECRET_KEY}
+    
+    networks:
+      polyfiller:
+    
+    services:
+      autoheal:
+        image: willfarrell/autoheal:1.2.0
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        restart: always
+    
+      meta-server:
+        depends_on:
+          - autoheal
+        image: postgres
+        environment:
+          - POSTGRES_USER=postgres
+          - POSTGRES_DB=juicefs
+          - POSTGRES_PASSWORD=\${META_PASSWORD}
+        volumes:
+          - ./data:/var/lib/postgresql/data/
+        networks:
+          - polyfiller
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          interval: 3s
+          retries: 5
+        labels:
+          - autoheal=true
+        restart: always
+    
+      api-service:
+        depends_on:
+          - autoheal
+          - meta-server
+        image: polyfiller/api-service
+        environment:
+          - NODE_ENV=production
+        volumes:
+          - polyfill-cache:/tmp/@wessberg/polyfiller
+        networks:
+          - polyfiller
+        healthcheck:
+          test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
+          interval: 300000000s
+          retries: 5
+          start_period: 30s
+        labels:
+          - autoheal=true
+        restart: always
+        logging:
+          driver: json-file
+          options:
+            max-size: 10m
+    
+      caddy:
+        depends_on:
+          - api-service
+        image: caddy
+        ports:
+          - 80:80
+          - 443:443
+        networks:
+          - polyfiller
+        restart: always
+        command: caddy reverse-proxy --from polyfiller.app --to api-service:3000
+      `;
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(`
+"docker network create polyfiller
+docker volume create -d juicedata/juicefs -o name=polyfill-cache -o metaurl=postgres://postgres:\${META_PASSWORD}@meta-server:5432/juicefs -o storage=\${STORAGE_TYPE} -o bucket=\${BUCKET} -o access-key=\${ACCESS_KEY} -o secret-key=\${SECRET_KEY} polyfill-cache
+docker run -v /var/run/docker.sock:/var/run/docker.sock --restart always willfarrell/autoheal:1.2.0
+docker run --net polyfiller -e POSTGRES_USER=postgres -e POSTGRES_DB=juicefs -e POSTGRES_PASSWORD=\${META_PASSWORD} -v ./data:/var/lib/postgresql/data/ --health-cmd \\"CMD-SHELL,pg_isready -U postgres\\" --health-interval 3s --health-retries 5 -l autoheal=true --restart always postgres
+docker run --net polyfiller -e NODE_ENV=production -v polyfill-cache:/tmp/@wessberg/polyfiller --health-cmd \\"CMD-SHELL,curl -f http://localhost:3000/ || exit 1\\" --health-interval 300000000s --health-retries 5 --health-start-period 30s -l autoheal=true --restart always --log-driver json-file --log-opt max-size=10m polyfiller/api-service
+docker run --net polyfiller -p 80:80 -p 443:443 --restart always caddy caddy reverse-proxy --from polyfiller.app --to api-service:3000"
+`);
+});
+
+test('top level networks and volumes', () => {
+    const compose = `
+            version: '3.3'
+            services:
+                baz:
+                    image: 'foobar/baz:latest'
+            networks:
+                mynet1:
+                    ipam:
+                        driver: default
+                        config:
+                            - subnet: 172.28.0.0/16
+                              ip_range: 172.28.5.0/24
+                              gateway: 172.28.5.254
+                              aux_addresses:
+                                host1: 172.28.1.5
+                                host2: 172.28.1.6
+                                host3: 172.28.1.7
+                        options:
+                            foo: bar
+                            baz: "0"
+                mynet2:
+                    driver: default
+                    attachable: true
+                    enable_ipv6: true
+                    internal: true
+                    driver_opts:
+                        foo: bar
+                        baz: "0"
+                    labels:
+                        - "com.example.description=Financial transaction network"
+                        - "com.example.department=Finance"
+                        - "com.example.label-with-empty-value"                        
+            volumes:
+                example:
+                    driver: foobar
+                    driver_opts:
+                        type: "nfs"
+                        o: "addr=10.40.0.199,nolock,soft,rw"
+                        device: ":/docker/example"
+                db-data:
+                    labels:
+                        com.example.description: "Database volume"
+                        com.example.department: "IT/Ops"
+                        com.example.label-with-empty-value: ""                        
+      `;
+
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(`
+"docker network create -d default -o foo=bar -o baz=0 --subnet 172.28.0.0/16 --ip-range 172.28.5.0/24 --gateway 172.28.5.254 --aux-address host1=172.28.1.5 --aux-address host2=172.28.1.6 --aux-address host3=172.28.1.7 mynet1
+docker network create -d default --attachable --ipv6 --internal -o foo=bar -o baz=0 --label 0=com.example.description=Financial transaction network --label 1=com.example.department=Finance --label 2=com.example.label-with-empty-value mynet2
+docker volume create -d foobar -o type=nfs -o o=addr=10.40.0.199,nolock,soft,rw -o device=:/docker/example example
+docker volume create --label com.example.description=Database volume --label com.example.department=IT/Ops --label com.example.label-with-empty-value= db-data
+docker run foobar/baz:latest"
+`);
 });

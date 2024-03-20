@@ -47,22 +47,93 @@ export default (input: string, configuration: Configuration = {}): ?string => {
     };
 
     const commands = [];
+
+    const pushOptionAndNameToCommand = (commandOptions: string[], argumentNames: string, value: String | string) => {
+        let argument = argumentNames;
+        if (argumentNames.includes('/')) argument = argumentNames.split('/')[config['long-args'] ? 0 : 1];
+
+        const dash = argument.length === 1 ? '-' : '--';
+        // $FlowFixMe
+        if (value !== '' && value !== null)
+            commandOptions.push(`${dash}${argument}${config['arg-value-separator']}${value.toString()}`);
+        else commandOptions.push(`${dash}${argument}`);
+    };
+
+    Object.entries(composeJson.networks || []).forEach(([networkName, network]) => {
+        const commandOptions = [];
+
+        const pushOptionAndName = (argumentNames: string, value: String | string) =>
+            pushOptionAndNameToCommand(commandOptions, argumentNames, value);
+
+        if (network) {
+            if (network.driver) pushOptionAndName('driver/d', network.driver);
+            if (network.attachable === true) pushOptionAndName('attachable', '');
+            if (network.enable_ipv6 === true) pushOptionAndName('ipv6', '');
+            if (network.internal === true) pushOptionAndName('internal', '');
+            if (network.ipam) {
+                const { ipam } = network;
+                if (ipam.driver) pushOptionAndName('driver/d', ipam.driver);
+                Object.entries(ipam.options || []).forEach(([driverOptName, driverOptValue]) => {
+                    pushOptionAndName('opt/o', driverOptName ? `${driverOptName}=${driverOptValue}` : driverOptValue);
+                });
+                (ipam.config || []).forEach((ipamConfig) => {
+                    if (ipamConfig.subnet) pushOptionAndName('subnet', ipamConfig.subnet);
+                    if (ipamConfig.ip_range) pushOptionAndName('ip-range', ipamConfig.ip_range);
+                    if (ipamConfig.gateway) pushOptionAndName('gateway', ipamConfig.gateway);
+                    Object.entries(ipamConfig.aux_addresses || []).forEach(([auxName, auxValue]) => {
+                        pushOptionAndName('aux-address', auxName ? `${auxName}=${auxValue}` : auxValue);
+                    });
+                });
+            }
+
+            Object.entries(network.driver_opts || []).forEach(([driverOptName, driverOptValue]) => {
+                pushOptionAndName('opt/o', driverOptName ? `${driverOptName}=${driverOptValue}` : driverOptValue);
+            });
+            Object.entries(network.labels || []).forEach(([labelName, labelValue]) => {
+                pushOptionAndName('label', labelName ? `${labelName}=${labelValue}` : labelValue);
+            });
+        }
+
+        // $FlowFixMe
+        commandOptions.push(network?.name || networkName);
+
+        commands.push(
+            `docker network create ${commandOptions.join(config.multiline ? ' \\\n\t' : ' ')}`.replace(/[ ]+/g, ' '),
+        );
+    });
+
+    Object.entries(composeJson.volumes || []).forEach(([volumeName, volume]) => {
+        const commandOptions = [];
+
+        const pushOptionAndName = (argumentNames: string, value: String | string) =>
+            pushOptionAndNameToCommand(commandOptions, argumentNames, value);
+
+        if (volume) {
+            if (volume.driver) pushOptionAndName('driver/d', volume.driver);
+            Object.entries(volume.driver_opts || []).forEach(([driverOptName, driverOptValue]) => {
+                pushOptionAndName('opt/o', driverOptName ? `${driverOptName}=${driverOptValue}` : driverOptValue);
+            });
+            Object.entries(volume.labels || []).forEach(([labelName, labelValue]) => {
+                pushOptionAndName('label', labelName ? `${labelName}=${labelValue}` : labelValue);
+            });
+        }
+
+        // $FlowFixMe
+        commandOptions.push(volume?.external?.name || volume?.name || volumeName);
+
+        commands.push(
+            `docker volume create ${commandOptions.join(config.multiline ? ' \\\n\t' : ' ')}`.replace(/[ ]+/g, ' '),
+        );
+    });
+
     Object.entries(composeJson.services).forEach(([, service]) => {
         const commandOptions = [];
 
+        const pushOptionAndName = (argumentNames: string, value: String | string) =>
+            pushOptionAndNameToCommand(commandOptions, argumentNames, value);
+
         if (config.rm === true) commandOptions.push('--rm');
         if (config.detach === true) commandOptions.push(config['long-args'] ? '--detach' : '-d');
-
-        const pushOptionAndName = (argumentNames: string, value: String | string) => {
-            let argument = argumentNames;
-            if (argumentNames.includes('/')) argument = argumentNames.split('/')[config['long-args'] ? 0 : 1];
-
-            const dash = argument.length === 1 ? '-' : '--';
-            // $FlowFixMe
-            if (value !== '' && value !== null)
-                commandOptions.push(`${dash}${argument}${config['arg-value-separator']}${value.toString()}`);
-            else commandOptions.push(`${dash}${argument}`);
-        };
 
         const networkMode = getObjectByPath('network_mode', service);
         const networks = getObjectByPath('networks', service);
@@ -90,12 +161,16 @@ export default (input: string, configuration: Configuration = {}): ?string => {
                 if (type !== 'Networks' && !targetValue) return;
 
                 if (type === 'Array') {
-                    // $FlowFixMe: supposed to be an array
-                    targetValue.forEach((v) => {
-                        if (typeof v === 'object' || v === null) return;
+                    if (Array.isArray(targetValue)) {
+                        // $FlowFixMe: supposed to be an array
+                        targetValue.forEach((v) => {
+                            if (typeof v === 'object' || v === null) return;
 
-                        pushOption(String(stringify(v)));
-                    });
+                            pushOption(String(stringify(v)));
+                        });
+                    } else {
+                        pushOption(stringify(targetValue));
+                    }
                 }
                 if (type === 'Ulimits') {
                     Object.entries(targetValue).forEach(([key, v]) => {
@@ -161,5 +236,6 @@ export default (input: string, configuration: Configuration = {}): ?string => {
             `${config.command} ${commandOptions.join(config.multiline ? ' \\\n\t' : ' ')}`.replace(/[ ]+/g, ' '),
         );
     });
+
     return commands.join('\n');
 };
