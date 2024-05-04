@@ -126,116 +126,120 @@ export default (input: string, configuration: Configuration = {}): ?string => {
         );
     });
 
-    Object.entries(composeJson.services).forEach(([, service]) => {
-        const commandOptions = [];
+    if (typeof composeJson.services === 'string') {
+        commands.push(config.command);
+    } else {
+        Object.entries(composeJson.services).forEach(([, service]) => {
+            const commandOptions = [];
 
-        const pushOptionAndName = (argumentNames: string, value: String | string) =>
-            pushOptionAndNameToCommand(commandOptions, argumentNames, value);
+            const pushOptionAndName = (argumentNames: string, value: String | string) =>
+                pushOptionAndNameToCommand(commandOptions, argumentNames, value);
 
-        if (config.rm === true) commandOptions.push('--rm');
-        if (config.detach === true) commandOptions.push(config['long-args'] ? '--detach' : '-d');
+            if (config.rm === true) commandOptions.push('--rm');
+            if (config.detach === true) commandOptions.push(config['long-args'] ? '--detach' : '-d');
 
-        const networkMode = getObjectByPath('network_mode', service);
-        const networks = getObjectByPath('networks', service);
-        if (networkMode) pushOptionAndName('network/net', networkMode);
-        else if (networks)
-            Object.entries(networks).forEach(([networkOrIndex, networkConfOrName]) => {
-                const network =
-                    typeof networkConfOrName === 'string' ? String(networkConfOrName) : String(networkOrIndex);
+            const networkMode = getObjectByPath('network_mode', service);
+            const networks = getObjectByPath('networks', service);
+            if (networkMode) pushOptionAndName('network/net', networkMode);
+            else if (networks)
+                Object.entries(networks).forEach(([networkOrIndex, networkConfOrName]) => {
+                    const network =
+                        typeof networkConfOrName === 'string' ? String(networkConfOrName) : String(networkOrIndex);
 
-                // $FlowFixMe
-                pushOptionAndName('network/net', String(network));
-            });
+                    // $FlowFixMe
+                    pushOptionAndName('network/net', String(network));
+                });
 
-        // $FlowFixMe: dynamic json object deconstruct
-        Object.keys(service).forEach((serviceOption) => {
-            Object.entries(MAPPINGS).forEach(([argumentNames, mapping]) => {
-                // $FlowFixMe: dynamic json object deconstruct
-                const { type, path } = mapping;
+            // $FlowFixMe: dynamic json object deconstruct
+            Object.keys(service).forEach((serviceOption) => {
+                Object.entries(MAPPINGS).forEach(([argumentNames, mapping]) => {
+                    // $FlowFixMe: dynamic json object deconstruct
+                    const { type, path } = mapping;
 
-                if (!path.startsWith(`${serviceOption}/`) && path !== serviceOption) return;
+                    if (!path.startsWith(`${serviceOption}/`) && path !== serviceOption) return;
 
-                const pushOption = (value: String | string) => pushOptionAndName(argumentNames, value);
+                    const pushOption = (value: String | string) => pushOptionAndName(argumentNames, value);
 
-                const targetValue = getObjectByPath(path, service);
-                if (type !== 'Networks' && !targetValue) return;
+                    const targetValue = getObjectByPath(path, service);
+                    if (type !== 'Networks' && !targetValue) return;
 
-                if (type === 'Array') {
-                    if (Array.isArray(targetValue)) {
-                        // $FlowFixMe: supposed to be an array
-                        targetValue.forEach((v) => {
-                            if (typeof v === 'object' || v === null) return;
+                    if (type === 'Array') {
+                        if (Array.isArray(targetValue)) {
+                            // $FlowFixMe: supposed to be an array
+                            targetValue.forEach((v) => {
+                                if (typeof v === 'object' || v === null) return;
 
-                            pushOption(String(stringify(v)));
+                                pushOption(String(stringify(v)));
+                            });
+                        } else {
+                            pushOption(stringify(targetValue));
+                        }
+                    }
+                    if (type === 'Ulimits') {
+                        Object.entries(targetValue).forEach(([key, v]) => {
+                            // $FlowFixMe: dynamic json object deconstruct
+                            const { soft, hard } = v;
+                            if (hard && soft) pushOption(String(`${key}=${soft}:${hard}`));
+                            // $FlowFixMe: dynamic json object
+                            else pushOption(String(`${key}=${v}`));
                         });
-                    } else {
+                    }
+                    if (type === 'Switch') {
+                        // $FlowFixMe
+                        if (targetValue.toString() === 'true') pushOption('');
+                    }
+                    if (type === 'Value') {
                         pushOption(stringify(targetValue));
                     }
-                }
-                if (type === 'Ulimits') {
-                    Object.entries(targetValue).forEach(([key, v]) => {
-                        // $FlowFixMe: dynamic json object deconstruct
-                        const { soft, hard } = v;
-                        if (hard && soft) pushOption(String(`${key}=${soft}:${hard}`));
-                        // $FlowFixMe: dynamic json object
-                        else pushOption(String(`${key}=${v}`));
-                    });
-                }
-                if (type === 'Switch') {
-                    // $FlowFixMe
-                    if (targetValue.toString() === 'true') pushOption('');
-                }
-                if (type === 'Value') {
-                    pushOption(stringify(targetValue));
-                }
-                if (type === 'IntValue') {
-                    pushOption(String(targetValue));
-                }
-                if (type === 'FloatValue') {
-                    pushOption(String(targetValue));
-                }
-                if (type === 'DeviceBlockIOConfigRate') {
-                    // $FlowFixMe: supposed to be an array
-                    targetValue.forEach((v) => {
-                        const { path: deviceIORatePath, rate } = v;
-                        pushOption(String(`${deviceIORatePath}:${rate}`));
-                    });
-                }
-                if (type === 'DeviceBlockIOConfigWeight') {
-                    // $FlowFixMe: supposed to be an array
-                    targetValue.forEach((v) => {
-                        const { path: deviceIOWeightPath, weight } = v;
-                        pushOption(String(`${deviceIOWeightPath}:${weight}`));
-                    });
-                }
-                if (type === 'MapArray') {
-                    // $FlowFixMe: supposed to be an array
-                    targetValue.forEach((v) => {
-                        if (typeof v !== 'object') return;
+                    if (type === 'IntValue') {
+                        pushOption(String(targetValue));
+                    }
+                    if (type === 'FloatValue') {
+                        pushOption(String(targetValue));
+                    }
+                    if (type === 'DeviceBlockIOConfigRate') {
+                        // $FlowFixMe: supposed to be an array
+                        targetValue.forEach((v) => {
+                            const { path: deviceIORatePath, rate } = v;
+                            pushOption(String(`${deviceIORatePath}:${rate}`));
+                        });
+                    }
+                    if (type === 'DeviceBlockIOConfigWeight') {
+                        // $FlowFixMe: supposed to be an array
+                        targetValue.forEach((v) => {
+                            const { path: deviceIOWeightPath, weight } = v;
+                            pushOption(String(`${deviceIOWeightPath}:${weight}`));
+                        });
+                    }
+                    if (type === 'MapArray') {
+                        // $FlowFixMe: supposed to be an array
+                        targetValue.forEach((v) => {
+                            if (typeof v !== 'object') return;
 
+                            const mapValues = [];
+                            Object.entries(v).forEach(([key, vv]) => mapValues.push(`${key}=${stringify(vv)}`));
+                            pushOption(String(mapValues.join(',')));
+                        });
+                    }
+                    if (type === 'Map') {
                         const mapValues = [];
-                        Object.entries(v).forEach(([key, vv]) => mapValues.push(`${key}=${stringify(vv)}`));
+                        Object.entries(targetValue).forEach(([key, vv]) => mapValues.push(`${key}=${stringify(vv)}`));
                         pushOption(String(mapValues.join(',')));
-                    });
-                }
-                if (type === 'Map') {
-                    const mapValues = [];
-                    Object.entries(targetValue).forEach(([key, vv]) => mapValues.push(`${key}=${stringify(vv)}`));
-                    pushOption(String(mapValues.join(',')));
-                }
+                    }
+                });
             });
+
+            // $FlowFixMe
+            commandOptions.push(service.image);
+
+            // $FlowFixMe
+            if (service.command) commandOptions.push(service.command);
+
+            commands.push(
+                `${config.command} ${commandOptions.join(config.multiline ? ' \\\n\t' : ' ')}`.replace(/[ ]+/g, ' '),
+            );
         });
-
-        // $FlowFixMe
-        commandOptions.push(service.image);
-
-        // $FlowFixMe
-        if (service.command) commandOptions.push(service.command);
-
-        commands.push(
-            `${config.command} ${commandOptions.join(config.multiline ? ' \\\n\t' : ' ')}`.replace(/[ ]+/g, ' '),
-        );
-    });
+    }
 
     return commands.join('\n');
 };
