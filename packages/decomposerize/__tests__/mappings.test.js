@@ -1296,3 +1296,22 @@ test('-e (object #73)', () => {
         '"docker run -e alone -e test1=value -e test2=12 -p 80:80 foobar/baz:latest"',
     );
 });
+
+test('mapping objects #73', () => {
+    const compose = `
+  services:
+    alpine:
+      image: alpine
+      environment:
+        NODE_ENV: production
+      labels:
+        com.centurylinklabs.watchtower.enable: "false"
+      sysctls:
+        net.core.somaxconn: 1024
+        net.ipv4.tcp_syncookies: 0
+      `;
+
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(
+        '"docker run -e NODE_ENV=production -l com.centurylinklabs.watchtower.enable=false --sysctl net.core.somaxconn=1024 --sysctl net.ipv4.tcp_syncookies=0 alpine"',
+    );
+});

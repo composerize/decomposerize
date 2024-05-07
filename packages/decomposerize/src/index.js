@@ -177,7 +177,7 @@ export default (input: string, configuration: Configuration = {}): ?string => {
                         pushOption(stringify(targetValue));
                     } else {
                         Object.entries(targetValue).forEach(([k, v]) => {
-                            pushOption(v ? `${k}=${stringify(v)}` : k);
+                            pushOption(v !== null ? `${k}=${stringify(v)}` : k);
                         });
                     }
                 }
