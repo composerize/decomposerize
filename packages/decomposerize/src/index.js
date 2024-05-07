@@ -173,8 +173,12 @@ export default (input: string, configuration: Configuration = {}): ?string => {
 
                             pushOption(String(stringify(v)));
                         });
-                    } else {
+                    } else if (typeof targetValue === 'string') {
                         pushOption(stringify(targetValue));
+                    } else {
+                        Object.entries(targetValue).forEach(([k, v]) => {
+                            pushOption(v ? `${k}=${stringify(v)}` : k);
+                        });
                     }
                 }
                 if (type === 'Ulimits') {

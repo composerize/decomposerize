@@ -705,6 +705,20 @@ test('--sysctl', () => {
     ).toMatchInlineSnapshot('"docker run --sysctl net.core.somaxconn=1024 --sysctl net.ipv4.tw_reuse=1 someimage"');
 });
 
+test('--sysctl (object #73)', () => {
+    expect(
+        Decomposerize(`
+        version: '3.3'
+        services:
+            someimage:
+                sysctls:
+                    net.core.somaxconn: 1024
+                    net.ipv4.tw_reuse: 1
+                image: someimage
+            `),
+    ).toMatchInlineSnapshot('"docker run --sysctl net.core.somaxconn=1024 --sysctl net.ipv4.tw_reuse=1 someimage"');
+});
+
 test('dns, link, add host', () => {
     expect(
         Decomposerize(`
@@ -791,6 +805,21 @@ test('--label', () => {
                 labels:
                     - my-label
                     - com.example.foo=bar
+                image: ubuntu
+                command: bash
+            `),
+    ).toMatchInlineSnapshot('"docker run -l my-label -l com.example.foo=bar ubuntu bash"');
+});
+
+test('--label (object #73)', () => {
+    expect(
+        Decomposerize(`
+        version: '3.3'
+        services:
+            ubuntu:
+                labels:
+                    my-label:
+                    com.example.foo: bar
                 image: ubuntu
                 command: bash
             `),
@@ -1247,4 +1276,23 @@ docker volume create -d foobar -o type=nfs -o o=addr=10.40.0.199,nolock,soft,rw 
 docker volume create --label com.example.description=Database volume --label com.example.department=IT/Ops --label com.example.label-with-empty-value= db-data
 docker run foobar/baz:latest"
 `);
+});
+
+test('-e (object #73)', () => {
+    const compose = `
+            version: '3.3'
+            services:
+                baz:
+                    environment:
+                        alone:
+                        test1: value
+                        test2: 12
+                    ports:
+                        - '80:80'
+                    image: 'foobar/baz:latest'
+      `;
+
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(
+        '"docker run -e alone -e test1=value -e test2=12 -p 80:80 foobar/baz:latest"',
+    );
 });
