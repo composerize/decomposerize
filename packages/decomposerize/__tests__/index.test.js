@@ -311,3 +311,12 @@ docker run --net kong-net \\\\
 	kong:latest"
 `);
 });
+
+test('docker run when typing (#74)', () => {
+    const compose = `
+    services:
+      abcdef
+  `;
+
+    expect(Decomposerize(compose)).toMatchInlineSnapshot('"# invalid Docker Compose"');
+});

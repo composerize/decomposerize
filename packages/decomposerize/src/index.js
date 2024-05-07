@@ -27,6 +27,11 @@ export type Configuration = {
 export default (input: string, configuration: Configuration = {}): ?string => {
     const composeJson = Composeverter.yamlParse(Composeverter.migrateToCommonSpec(input));
     if (!composeJson || !composeJson.services) return '';
+
+    if (typeof composeJson.services === 'string') {
+        return '# invalid Docker Compose';
+    }
+
     const defaultConfiguration = {
         command: 'docker run',
         rm: false,
