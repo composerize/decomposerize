@@ -5,6 +5,7 @@ export type ArgType =
     // Used for lists of things
     // e.g. --device (https://docs.docker.com/compose/compose-file/#devices)
     | 'Array'
+    | 'ArrayAutoRepair'
 
     // Used to store a "limits" value of the input format: <type>=<soft limit>[:<hard limit>]
     // e.g. --ulimit
@@ -66,7 +67,7 @@ export const MAPPINGS: { [string]: Mapping } = {
     domainname: getMapping('Value', 'domainname'),
     entrypoint: getMapping('Array', 'entrypoint'),
     'env-file': getMapping('Array', 'env_file'),
-    'env/e': getMapping('Array', 'environment'),
+    'env/e': getMapping('ArrayAutoRepair', 'environment'),
     expose: getMapping('Array', 'expose'),
     gpus: getMapping('Value', 'deploy/resources/reservations/devices/:first:/count'),
     'group-add': getMapping('Array', 'group_add'),

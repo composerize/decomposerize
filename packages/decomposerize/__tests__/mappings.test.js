@@ -1315,3 +1315,24 @@ test('mapping objects #73', () => {
         '"docker run -e NODE_ENV=production -l com.centurylinklabs.watchtower.enable=false --sysctl net.core.somaxconn=1024 --sysctl net.ipv4.tcp_syncookies=0 alpine"',
     );
 });
+
+test('invalid form of environment auto repair (https://github.com/composerize/decomposerize/issues/73#issuecomment-2469386987)', () => {
+    const compose = `
+services:
+  paradedb:
+    image: oaklight/vectorsearch
+    container_name: vectorsearch
+    environment:
+      - POSTGRES_USER: myuser
+      - POSTGRES_PASSHORD: mypassword
+      - POSTGRES_DB: nydatabase
+    ports:
+      - 5432:5432
+    volumes:
+      - $pwd/pgdata:/var/lib/postgresql/data/
+    `;
+
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(
+        '"docker run --name vectorsearch -e POSTGRES_USER=myuser -e POSTGRES_PASSHORD=mypassword -e POSTGRES_DB=nydatabase -p 5432:5432 -v $pwd/pgdata:/var/lib/postgresql/data/ oaklight/vectorsearch"',
+    );
+});

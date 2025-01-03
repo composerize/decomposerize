@@ -165,13 +165,20 @@ export default (input: string, configuration: Configuration = {}): ?string => {
                 const targetValue = getObjectByPath(path, service);
                 if (type !== 'Networks' && !targetValue) return;
 
-                if (type === 'Array') {
+                if (type === 'Array' || type === 'ArrayAutoRepair') {
                     if (Array.isArray(targetValue)) {
                         // $FlowFixMe: supposed to be an array
                         targetValue.forEach((v) => {
-                            if (typeof v === 'object' || v === null) return;
+                            if (v === null) return;
+                            if (typeof v === 'object') {
+                                if (type === 'Array') return;
 
-                            pushOption(String(stringify(v)));
+                                Object.entries(v).forEach(([kk, vv]) => {
+                                    pushOption(vv !== null ? `${kk}=${stringify(vv)}` : kk);
+                                });
+                            } else {
+                                pushOption(String(stringify(v)));
+                            }
                         });
                     } else if (typeof targetValue === 'string') {
                         pushOption(stringify(targetValue));
