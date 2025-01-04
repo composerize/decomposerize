@@ -1,6 +1,6 @@
 {
   "name": "decomposerize",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "main": "dist/decomposerize.js",
   "license": "MIT",
   "scripts": {
@@ -33,8 +33,7 @@
   },
   "dependencies": {
     "composeverter": "latest",
-    "core-js": "^2.5.5",
-    "yaml": "^1.10.2"
+    "core-js": "^2.5.5"
   },
   "files": [
     "dist/decomposerize.js",

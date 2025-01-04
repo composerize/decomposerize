@@ -4925,13 +4925,12 @@ decimal.js@^10.2.1:
   integrity sha512-VBBaLc1MgL5XpzgIP7ny5Z6Nx3UrRkIViUkPUdtl9aya5amy3De1gsUUSB1g3+3sExYNjCAsAznmukyxCb1GRA==
 
 decomposerize@latest:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/decomposerize/-/decomposerize-1.4.2.tgz#751391562a316a2426269c1ec3347465730e8ecf"
-  integrity sha512-nocWO3r0LFj5GeyT89MP3navkFa2HPHBM92BxMZ3KSDSLv/ZtP1B9ZSC0Gf02H/JLDf7WWPtmIGV9HEe9OYrFw==
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/decomposerize/-/decomposerize-1.4.3.tgz#7ba2170cc1daa53d1a5edaca987f546950187bb4"
+  integrity sha512-qQi1CvGVzq5jF/LLMs2k1RFTiOh7V8K8JgC/kGuYH9QGS8xVmPxtYnvFNB/zzq6n6WcRB7GoDZCIPhzwS/lE1w==
   dependencies:
     composeverter latest
     core-js "^2.5.5"
-    yaml "^1.10.2"
 
 dedent@0.7.0, dedent@^0.7.0:
   version "0.7.0"
@@ -6151,9 +6150,9 @@ flatted@^3.2.9:
   integrity sha512-AiwGJM8YcNOaobumgtng+6NHuOqC3A7MixFeDafM3X9cIUM+xUXoS5Vfgf+OihAYe20fxqNM9yPBXJzRtZ/4eA==
 
 flow-bin@^0.x:
-  version "0.257.1"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.257.1.tgz#0cae61fb756b443b5cbbb4637905570579f9a216"
-  integrity sha512-jDn/4uCXX8NlnRJbQD/4B60Id7Vm1+y+LsgJMevhN+6vCPZ1jVV8LGGTcdhsogyIPf9orTt5fROo2FemRZD9kA==
+  version "0.258.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.258.0.tgz#4aa2ee3166af8be2c4d8ae0b85384f67b6379a6e"
+  integrity sha512-7Vn3NEAB3abwUi6j6UlQrqAJIsfmB0WS/TmFnSJlyMv0dL5DURwAjw0RbHoknz8rX5UY8KgFWjDtPO6xTOS3ng==
 
 follow-redirects@^1.0.0, follow-redirects@^1.15.6:
   version "1.15.9"
