@@ -1316,7 +1316,7 @@ test('mapping objects #73', () => {
     );
 });
 
-test('invalid form of environment auto repair (https://github.com/composerize/decomposerize/issues/73#issuecomment-2469386987)', () => {
+test('invalid form of environment auto repair (case 1) (https://github.com/composerize/decomposerize/issues/73#issuecomment-2469386987)', () => {
     const compose = `
 services:
   paradedb:
@@ -1326,6 +1326,27 @@ services:
       - POSTGRES_USER: myuser
       - POSTGRES_PASSHORD: mypassword
       - POSTGRES_DB: nydatabase
+    ports:
+      - 5432:5432
+    volumes:
+      - $pwd/pgdata:/var/lib/postgresql/data/
+    `;
+
+    expect(Decomposerize(compose)).toMatchInlineSnapshot(
+        '"docker run --name vectorsearch -e POSTGRES_USER=myuser -e POSTGRES_PASSHORD=mypassword -e POSTGRES_DB=nydatabase -p 5432:5432 -v $pwd/pgdata:/var/lib/postgresql/data/ oaklight/vectorsearch"',
+    );
+});
+
+test('invalid form of environment auto repair (case 2) (https://github.com/composerize/decomposerize/issues/73#issuecomment-2469386987)', () => {
+    const compose = `
+services:
+  paradedb:
+    image: oaklight/vectorsearch
+    container_name: vectorsearch
+    environment:
+      - POSTGRES_USER:myuser
+      - POSTGRES_PASSHORD:mypassword
+      - POSTGRES_DB:nydatabase
     ports:
       - 5432:5432
     volumes:

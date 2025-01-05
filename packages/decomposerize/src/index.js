@@ -177,7 +177,14 @@ export default (input: string, configuration: Configuration = {}): ?string => {
                                     pushOption(vv !== null ? `${kk}=${stringify(vv)}` : kk);
                                 });
                             } else {
-                                pushOption(String(stringify(v)));
+                                const stringValue = String(stringify(v));
+                                if (type === 'ArrayAutoRepair') {
+                                    if (!stringValue.includes('=')) {
+                                        pushOption(stringValue.replace(/:/, '='));
+                                        return;
+                                    }
+                                }
+                                pushOption(stringValue);
                             }
                         });
                     } else if (typeof targetValue === 'string') {

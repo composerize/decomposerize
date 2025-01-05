@@ -1,6 +1,6 @@
 {
   "name": "decomposerize",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "main": "dist/decomposerize.js",
   "license": "MIT",
   "scripts": {
