@@ -20,7 +20,11 @@ decomposerize can be run in the cli.
 $ decomposerize << docker-compose.yml
 ```
 
-# API
+## Docker image
+
+A dockker image of composerize, decomposerize and composeverter websites is available here: https://github.com/Oaklight/composerize-minimal/blob/master/README_en.md (thanks to @Oaklight)
+
+## API
 
 **convertToDockerRunCommands(dockerComposeContent, configuration={})**
 
@@ -37,7 +41,7 @@ $ decomposerize << docker-compose.yml
 
 It returns the Docker run command(s) generated based on the input Docker Compose file and the provided configuration
 
-# How to use with node.js
+### How to use with node.js
 
 Make sure to install the `composerize` package in your project by running:
 
